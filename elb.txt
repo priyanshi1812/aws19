@@ -1,1 +1,53 @@
 
+ques--> ec2_scenario_1:-
+
+design this architecture in aws cloud platform:
+
+i)  launch 2 ec2 instances with 512MB Ram and 1 core cpu 
+ii)  Use AMI as rhel 8
+iii)  host a php based website in apache server 
+iv)  allow only these protocol in ec2  ssh , http , https
+v)  website in ec2 instances must be accessed via ELB 
+vi) make sure you can not open website by writing ip address or public dns of ec2
+
+#######################################################################################################################################
+
+launch 2 instances with mentioned configuration in aws with their ami as rhel 8
+
+########################################################################################################################################
+
+follow these steps in both the instances -->
+
+1.  install httpd and start it's service using :
+
+yum install httpd -y
+systemctl start httpd-server
+systemctl start httpd.service
+systemctl enable httpd.service
+
+2.  install php
+
+yum install php -y
+
+3.  go to var/www/html and create a file named index.php and write :
+
+[ec2-user@ip-172-31-84-187 html]$ cat index.php
+<?php
+phpinfo();
+?>
+
+4.  restart httpd service to update it :
+
+systemctl restart httpd.service
+
+note: allow http,https port security groups
+
+######################################################################################################################################
+
+create a load balancer with only http in its security group and add these two instances in it ,and wait till the status check shows 2/2
+
+now edit security group of instances and in http source set custom with load balancer's security group id 
+
+now the page will oonly load in balancer when dns of load balancer is used with http and not with instances public ip or dns 
+
+#######################################################################################################################################
